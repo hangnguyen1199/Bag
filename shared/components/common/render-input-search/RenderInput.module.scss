@@ -1,0 +1,33 @@
+@import "styles/common";
+
+.inputSearch {
+    flex-direction: row;
+    float: right !important;
+    text-align: right;
+    // min-width: 275px !important;
+    @include large() {
+        float: none !important;
+        text-align: center !important;
+        justify-content: center;
+    }
+    label{
+        font-size: 16px;
+        margin-bottom: 0px !important;
+        @include mobile() {
+            font-size: 14px;
+        }
+    }
+    input {
+        margin-left: 10px;
+        border: 1px solid #e2e2e2;
+        padding: 5px 8px;
+        color: black;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    input:focus {
+        box-shadow: none;
+        border-color: #e2e2e2 !important;
+    }
+}

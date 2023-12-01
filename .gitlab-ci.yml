@@ -1,0 +1,79 @@
+stages:
+  - build
+  - deploy
+
+Build:
+  stage: build
+  image: node:16.13.1-alpine
+  only:
+    - master
+    - web
+    - triggers
+  before_script:
+    - apk update && apk add openssh-client bash
+    - apk add zip
+      # chạy ssh-agent tương ứng với Gitlab Runner hiện tại
+    - eval $(ssh-agent -s)
+
+    # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
+    - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
+
+    # tạo folder ~/.ssh
+    - mkdir -p ~/.ssh
+
+    # Scan lấy SSH Host key cho địa chỉ IP server
+    # Được kết quả bao nhiêu thì thêm vào file known_hosts
+    - ssh-keyscan -H $SSH_SERVER_IP >> ~/.ssh/known_hosts
+
+    # Sửa lại quyền của file known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - yarn install
+    - yarn build
+    # Nén source
+    - zip -r source_build.zip build
+  artifacts:
+    paths:
+      - source_build.zip
+Deploy:
+  stage: deploy
+  only:
+    - master
+    - web
+    - triggers
+  before_script:
+    - echo "Before deploying ..."
+    - apk update && apk add openssh-client bash
+  script:
+    # chạy ssh-agent tương ứng với Gitlab Runner hiện tại
+    - eval $(ssh-agent -s)
+    # thêm nội dung của biến SSH_PRIVATE_KEY vào agent store
+    - bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
+    # tạo folder ~/.ssh
+    - mkdir -p ~/.ssh
+    # Scan lấy SSH Host key cho địa chỉ IP server
+    # Được kết quả bao nhiêu thì thêm vào file known_hosts
+    - ssh-keyscan -H -p $SSH_PORT $SSH_SERVER_IP >> ~/.ssh/known_hosts
+    # Sửa lại quyền của file known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ls -a
+    # Make build folder
+    - >
+      ssh $SSH_USER@$SSH_SERVER_IP -p $SSH_PORT
+      "cd $SERVER_DIR;
+      mkdir -p build;
+      "
+    # Upload source lên server
+    - echo 'put -r source_build.zip' | sftp -oPort=$SSH_PORT $SSH_USER@$SSH_SERVER_IP:$SERVER_DIR &&
+    # Unzip source đã build và xoá file zip
+    - >
+      ssh $SSH_USER@$SSH_SERVER_IP -p $SSH_PORT
+      "cd $SERVER_DIR;
+      unzip -o source_build.zip;
+      rm source_build.zip;
+      git pull origin master"
+    # Restart container with root account
+    - >
+      ssh $SSH_USER@$SSH_SERVER_IP -p $SSH_PORT
+      "docker restart $CONTAINER_ID"
+    - echo 'Deploy done!'

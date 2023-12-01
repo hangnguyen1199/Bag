@@ -1,0 +1,24 @@
+@import "styles/common";
+
+.renderSelect {
+    select {
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid #f0f1f5;
+        color: black;
+        height: 56px !important;
+
+        @include large() {
+            height: 41px !important;
+        }
+
+    }
+
+    select:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: none !important;
+    }
+}

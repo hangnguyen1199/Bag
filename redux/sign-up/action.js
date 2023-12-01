@@ -1,0 +1,11 @@
+const actions = {
+    SUBMIT_SIGN_UP: 'SUBMIT_SIGN_UP',
+    SUBMIT_SIGN_UP_SUCCESS: 'SUBMIT_SIGN_UP_SUCCESS',
+    SUBMIT_SIGN_UP_FAILURE: 'SUBMIT_SIGN_UP_FAILURE',
+
+    SIGN_UP: 'SIGN_UP',
+    RESET_SIGN_UP: "RESET_SIGN_UP"
+};
+
+export default actions;
+

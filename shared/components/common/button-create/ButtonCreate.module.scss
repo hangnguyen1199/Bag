@@ -1,0 +1,46 @@
+@import "styles/common";
+
+.buttonCreate{
+  button{
+    background-color: $buttonColor !important;
+    border-color: $buttonColor !important;    
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 19.5px;
+    span{
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+  }
+  button:hover{
+    color: #fff;
+    background-color: $buttonHover !important;
+    border-color: $buttonHover !important;
+  }
+  button:focus{
+    box-shadow: none !important;
+
+  }
+}
+$res_1400 : "only screen and (max-width: 1400px)";
+@mixin responsive_1400() {
+  @media #{$res_1400} {
+      @content;
+  }
+}
+
+@include responsive_1400{
+  .buttonCreate{
+    button{
+      padding: 10px 15px!important;
+      span{
+        font-size: 13px !important;
+        
+      }
+    }
+  }
+}
